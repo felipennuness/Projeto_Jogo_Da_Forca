@@ -1,0 +1,26 @@
+Pseudocódigo - Jogo da Forca em Python
+1. Limpar a tela  
+2. Exibir mensagem de boas-vindas  
+3. Definir temas disponíveis para o jogo (Frutas, Animais, Objetos, Países)  
+4. Solicitar ao usuário que escolha um tema  
+5. Carregar a lista de palavras correspondente ao tema escolhido (a partir de arquivos)  
+6. Escolher uma palavra aleatória da lista  
+7. Inicializar a palavra oculta com traços (um para cada letra)  
+8. Definir o número máximo de tentativas (6)  
+9. Criar uma lista para armazenar letras erradas  
+10. Enquanto o número de tentativas for maior que zero:
+    - Exibir boneco da forca conforme tentativas restantes  
+    - Exibir o estado atual da palavra (com traços e letras já adivinhadas)  
+    - Exibir tentativas restantes e letras erradas  
+    - Solicitar uma letra ao usuário  
+    - Validar se a letra é válida (apenas uma letra do alfabeto)  
+    - Se a letra estiver na palavra:
+        - Revelar todas as posições da letra na palavra oculta  
+    - Caso contrário:
+        - Diminuir o número de tentativas  
+        - Adicionar a letra na lista de letras erradas  
+    - Se todas as letras forem descobertas:
+        - Exibir mensagem de vitória e encerrar o jogo  
+11. Se as tentativas acabarem e a palavra não for descoberta:
+    - Exibir mensagem de derrota e mostrar a palavra correta  
+12. Exibir mensagem de encerramento do jogo
