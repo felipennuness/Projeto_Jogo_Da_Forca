@@ -1,174 +1,254 @@
-#projeto 1 - Desenvolvimento de Game em Linguagem Python - Versão 1
-
-#import
 import random
-from os import system, name
+import unicodedata
+from os import name, system
+from pathlib import Path
 
-#Função para limpar a tela a cada execução
+MAX_ERROS = 6
 
-def limpa_tela():
-    
-    #Windows
-    if name == 'nt':
-        _= system('cls')
+TEMAS = {
+    1: {"nome": "Frutas", "arquivo": "listaFrutas.txt"},
+    2: {"nome": "Animais", "arquivo": "listaAnimais.txt"},
+    3: {"nome": "Objetos", "arquivo": "listaObjetos.txt"},
+    4: {"nome": "Países", "arquivo": "listaPais.txt"},
+}
 
-    # Mac ou Linux
-    else:
-        _= system('clear')  
+FORCA = [
+    r"""
+       --------
+       |      |
+       |
+       |
+       |
+       |
+       -
+    """,
+    r"""
+       --------
+       |      |
+       |      O
+       |
+       |
+       |
+       -
+    """,
+    r"""
+       --------
+       |      |
+       |      O
+       |      |
+       |      |
+       |
+       -
+    """,
+    r"""
+       --------
+       |      |
+       |      O
+       |     \|
+       |      |
+       |
+       -
+    """,
+    r"""
+       --------
+       |      |
+       |      O
+       |     \|/
+       |      |
+       |
+       -
+    """,
+    r"""
+       --------
+       |      |
+       |      O
+       |     \|/
+       |      |
+       |     /
+       -
+    """,
+    r"""
+       --------
+       |      |
+       |      O
+       |     \|/
+       |      |
+       |     / \
+       -
+    """,
+]
 
-def display_hangman(chances):
 
-    # Lista de estágios da forca
-    stages = [  # estágio 6 (final)
-                """
-                   --------
-                   |      |
-                   |      O
-                   |     \\|/
-                   |      |
-                   |     / \\
-                   -
-                """,
-                # estágio 5
-                """
-                   --------
-                   |      |
-                   |      O
-                   |     \\|/
-                   |      |
-                   |     / 
-                   -
-                """,
-                # estágio 4
-                """
-                   --------
-                   |      |
-                   |      O
-                   |     \\|/
-                   |      |
-                   |      
-                   -
-                """,
-                # estágio 3
-                """
-                   --------
-                   |      |
-                   |      O
-                   |     \\|
-                   |      |
-                   |     
-                   -
-                """,
-                # estágio 2
-                """
-                   --------
-                   |      |
-                   |      O
-                   |      |
-                   |      |
-                   |     
-                   -
-                """,
-                # estágio 1
-                """
-                   --------
-                   |      |
-                   |      O
-                   |    
-                   |      
-                   |     
-                   -
-                """,
-                # estágio 0
-                """
-                   --------
-                   |      |
-                   |      
-                   |    
-                   |      
-                   |     
-                   -
-                """
-    ]
-    return stages[chances]
+def limpar_tela():
+    """Limpa o terminal no Windows, macOS ou Linux."""
+    system("cls" if name == "nt" else "clear")
 
-#Função
-def game():
-    
-    limpa_tela()
-    print("\nBem-Vindo(a) ao jogo da forca!")
-    temaJogo = ['Frutas','Animais','Objetos','Pais']
+
+def normalizar_texto(texto):
+    """Remove acentos e converte o texto para minúsculas."""
+    texto = unicodedata.normalize("NFD", texto.lower())
+    return "".join(
+        caractere
+        for caractere in texto
+        if unicodedata.category(caractere) != "Mn"
+    )
+
+
+def escolher_tema():
+    """Solicita um tema válido ao jogador."""
+    print("Escolha um tema:\n")
+
+    for numero, tema in TEMAS.items():
+        print(f"{numero} - {tema['nome']}")
+
     while True:
-        try:
-            opcao= int(input("Escolha um tema para o jogo: \n 1 - Frutas \n 2 - Animais \n 3 - Objetos \n 4 - Pais \n"))
-            if opcao not in [1, 2, 3, 4]:
-                print("Escolha um número entre 1 e 4!")
-                continue
-        except:
-            print ("Você não digitou um número!")
+        entrada = input("\nDigite o número do tema: ").strip()
+
+        if not entrada.isdigit():
+            print("Digite apenas o número da opção.")
             continue
+
+        opcao = int(entrada)
+
+        if opcao not in TEMAS:
+            print("Escolha uma opção entre 1 e 4.")
+            continue
+
+        return opcao
+
+
+def carregar_palavras(nome_arquivo):
+    """Carrega a lista de palavras do arquivo selecionado."""
+    caminho = Path(__file__).resolve().parent / "arquivos" / nome_arquivo
+
+    with caminho.open("r", encoding="utf-8") as arquivo:
+        palavras = [
+            palavra.strip().lower()
+            for palavra in arquivo.read().split(",")
+            if palavra.strip()
+        ]
+
+    if not palavras:
+        raise ValueError(f"Nenhuma palavra encontrada em {nome_arquivo}.")
+
+    return palavras
+
+
+def montar_palavra_oculta(palavra, letras_tentadas):
+    """Monta a palavra exibida, preservando espaços e hífens."""
+    exibicao = []
+
+    for caractere in palavra:
+        if not caractere.isalpha():
+            exibicao.append(caractere)
+        elif normalizar_texto(caractere) in letras_tentadas:
+            exibicao.append(caractere)
         else:
-            print ("\nTema Ecolhido: ",temaJogo[opcao - 1])
-            print("Adivinhe a palavra abaixo:\n")
-            break
+            exibicao.append("_")
 
-    # Lista de palavras para o jogo
-    nomeLista = ['listaFrutas.txt','listaAnimais.txt','listaObjetos.txt','listaPais.txt']
-    arquivo_selecionado = nomeLista[opcao - 1]  # Subtrai 1 para pegar o índice correto da lista
+    return " ".join(exibicao)
 
-    with open(f'arquivos/{arquivo_selecionado}', 'r', encoding='utf8', newline = '\r\n') as arquivo:
-        conteudo = arquivo.read().replace(' ', '').split(',')
-        palavras = [palavra.lower() for palavra in conteudo]
 
+def palavra_completa(palavra, letras_tentadas):
+    """Retorna True quando todas as letras da palavra foram descobertas."""
+    return all(
+        not caractere.isalpha()
+        or normalizar_texto(caractere) in letras_tentadas
+        for caractere in palavra
+    )
+
+
+def solicitar_letra(letras_tentadas):
+    """Solicita uma única letra ainda não utilizada."""
+    while True:
+        tentativa = input("\nDigite uma letra: ").strip().lower()
+
+        if len(tentativa) != 1 or not tentativa.isalpha():
+            print("Digite apenas uma letra.")
+            continue
+
+        letra_normalizada = normalizar_texto(tentativa)
+
+        if letra_normalizada in letras_tentadas:
+            print("Você já tentou essa letra. Escolha outra.")
+            continue
+
+        return letra_normalizada
+
+
+def jogar_rodada():
+    """Executa uma rodada completa do jogo."""
+    limpar_tela()
+
+    print("=" * 42)
+    print("           JOGO DA FORCA")
+    print("=" * 42)
+
+    opcao = escolher_tema()
+    tema = TEMAS[opcao]
+    palavras = carregar_palavras(tema["arquivo"])
     palavra = random.choice(palavras)
 
-    letras_descobertas = ['_' for letra in palavra]
-
-    # Número de chances
-    chances = 6
-
-    # Letras erradas
+    letras_tentadas = set()
     letras_erradas = []
+    erros = 0
+    palavra_normalizada = normalizar_texto(palavra)
 
-    # Loop enquanto número de chances for maior do que zero
-    while chances > 0:
+    while erros < MAX_ERROS:
+        limpar_tela()
 
-        #print
-        print(display_hangman(chances))
-        print(" ".join(letras_descobertas))
-        print("\nChances restantes:", chances)
-        print("Letras erradas:"," ".join(letras_erradas))
+        print("=" * 42)
+        print(f"JOGO DA FORCA | Tema: {tema['nome']}")
+        print("=" * 42)
+        print(FORCA[erros])
+        print(montar_palavra_oculta(palavra, letras_tentadas))
+        print(f"\nErros: {erros}/{MAX_ERROS}")
+        print(
+            "Letras erradas:",
+            " ".join(letras_erradas) if letras_erradas else "nenhuma",
+        )
 
-        #Tentativa
-        while(True):
-            tentativa = input("\nDigite uma letra: ").lower()
-            if tentativa.isalpha() and len(tentativa) == 1:
-                break  # Sai do loop de validação
-            else:
-                print("Por favor, digite apenas uma única letra.")
+        letra = solicitar_letra(letras_tentadas)
+        letras_tentadas.add(letra)
+
+        if letra not in palavra_normalizada:
+            erros += 1
+            letras_erradas.append(letra)
+
+        if palavra_completa(palavra, letras_tentadas):
+            limpar_tela()
+            print(FORCA[erros])
+            print(montar_palavra_oculta(palavra, letras_tentadas))
+            print(f"\nVocê venceu! A palavra era: {palavra.upper()}")
+            return
+
+    limpar_tela()
+    print(FORCA[MAX_ERROS])
+    print(f"\nVocê perdeu! A palavra era: {palavra.upper()}")
 
 
-        if tentativa in palavra:
-            index = 0
+def deseja_jogar_novamente():
+    """Pergunta se o jogador deseja iniciar uma nova rodada."""
+    while True:
+        resposta = input("\nDeseja jogar novamente? [S/N]: ").strip().lower()
 
-            for letra in palavra:
-                if tentativa == letra:
-                    letras_descobertas[index] = letra
-                index += 1
-        else:
-            chances -=1
-            letras_erradas.append(tentativa)
+        if resposta in {"s", "sim"}:
+            return True
 
-        # Condicional
-        if "_" not in letras_descobertas:
-            print("\nVocê venceu, a palavra era:", palavra)
+        if resposta in {"n", "nao", "não"}:
+            return False
+
+        print("Digite S para sim ou N para não.")
+
+
+def main():
+    while True:
+        jogar_rodada()
+
+        if not deseja_jogar_novamente():
+            print("\nObrigado por jogar!")
             break
 
-    # Condicional
-    if "_" in letras_descobertas:
-        print("\nVocê perdeu, a palavra era:",palavra)
 
-# Bloco main
 if __name__ == "__main__":
-    game()
-    print("\nParabéns. Você está aprendendo programação em Python com a DSA. :)\n")
+    main()
