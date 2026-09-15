@@ -1,26 +1,30 @@
 Pseudocódigo - Jogo da Forca em Python
-1. Limpar a tela  
-2. Exibir mensagem de boas-vindas  
-3. Definir temas disponíveis para o jogo (Frutas, Animais, Objetos, Países)  
-4. Solicitar ao usuário que escolha um tema  
-5. Carregar a lista de palavras correspondente ao tema escolhido (a partir de arquivos)  
-6. Escolher uma palavra aleatória da lista  
-7. Inicializar a palavra oculta com traços (um para cada letra)  
-8. Definir o número máximo de tentativas (6)  
-9. Criar uma lista para armazenar letras erradas  
-10. Enquanto o número de tentativas for maior que zero:
-    - Exibir boneco da forca conforme tentativas restantes  
-    - Exibir o estado atual da palavra (com traços e letras já adivinhadas)  
-    - Exibir tentativas restantes e letras erradas  
-    - Solicitar uma letra ao usuário  
-    - Validar se a letra é válida (apenas uma letra do alfabeto)  
-    - Se a letra estiver na palavra:
-        - Revelar todas as posições da letra na palavra oculta  
-    - Caso contrário:
-        - Diminuir o número de tentativas  
-        - Adicionar a letra na lista de letras erradas  
-    - Se todas as letras forem descobertas:
-        - Exibir mensagem de vitória e encerrar o jogo  
-11. Se as tentativas acabarem e a palavra não for descoberta:
-    - Exibir mensagem de derrota e mostrar a palavra correta  
-12. Exibir mensagem de encerramento do jogo
+
+1. Limpar a tela e exibir o título do jogo.
+2. Exibir os temas disponíveis: Frutas, Animais, Objetos e Países.
+3. Solicitar ao jogador que escolha um tema válido.
+4. Carregar a lista de palavras correspondente ao tema escolhido.
+5. Selecionar aleatoriamente uma palavra.
+6. Normalizar a palavra para permitir comparação sem exigir acentos na digitação.
+7. Inicializar:
+   - conjunto de letras já tentadas;
+   - lista de letras erradas;
+   - contador de erros com limite máximo de 6.
+8. Enquanto o limite de erros não for atingido:
+   - limpar a tela;
+   - exibir o estágio atual da forca;
+   - exibir a palavra oculta, preservando espaços e hífens;
+   - exibir o número de erros e as letras erradas;
+   - solicitar uma única letra ao jogador;
+   - validar se a entrada contém apenas uma letra;
+   - impedir que uma letra já utilizada seja repetida;
+   - verificar a letra desconsiderando acentuação;
+   - se a letra não existir na palavra, incrementar o contador de erros;
+   - se todas as letras forem descobertas, encerrar a rodada com vitória.
+9. Se o jogador atingir 6 erros:
+   - exibir o desenho completo da forca;
+   - mostrar a palavra correta;
+   - encerrar a rodada com derrota.
+10. Perguntar se o jogador deseja jogar novamente.
+11. Se a resposta for sim, iniciar uma nova rodada.
+12. Caso contrário, encerrar o programa.
